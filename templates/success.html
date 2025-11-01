@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>✅ Success Notification</title>
+<style>
+body{font-family:'Segoe UI',Arial,sans-serif;background-color:#f7f9fb;margin:0;padding:40px;}
+.container{max-width:600px;margin:auto;background:#fff;border-radius:12px;box-shadow:0 4px 8px rgba(0,0,0,0.05);}
+.header{background:linear-gradient(90deg,#6a11cb,#2575fc);color:#fff;padding:24px;text-align:center;}
+.content{padding:30px;}
+.badge{display:inline-block;padding:8px 14px;background:#e8f5e9;color:#2e7d32;font-weight:bold;border-radius:6px;}
+.footer{text-align:center;color:#777;font-size:13px;padding:20px;}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header"><h2>🚀 GitHub Action - Success!</h2></div>
+  <div class="content">
+    <h1>Hey {{name}}, your workflow finished successfully! 🎉</h1>
+    <p>The job <b>{{job_name}}</b> completed on <b>{{date}}</b>.</p>
+    <p>Status: <span class="badge">{{status}}</span></p>
+    <p>Everything went smoothly. Keep up the great work!</p>
+  </div>
+  <div class="footer">
+    Sent automatically by <b>Action Mailer ✨</b><br>
+    <small>GitHub Actions Email Notification</small>
+  </div>
+</div>
+</body>
+</html>

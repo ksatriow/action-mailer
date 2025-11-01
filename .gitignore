@@ -1,0 +1,36 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+logs/
+*.log
+*.log.*
+*.out
+*.pid
+*.seed
+*.tgz
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Editor folders
+.vscode/
+.idea/
+
+# Temporary files
+.tmp/
+*.tmp
+*.bak
+
+# Test artifacts
+coverage/
+dist/
+.env
+.env.local
+
+# GitHub Actions cache / build
+.github/workflows/*.tmp

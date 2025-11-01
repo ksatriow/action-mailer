@@ -1,0 +1,59 @@
+name: "Action Mailer ✨"
+description: "Send beautiful emails via SMTP or AWS SES with HTML templates, CC/BCC, and attachments."
+author: "yourname"
+branding:
+  icon: "mail"
+  color: "purple"
+
+inputs:
+  smtp-server:
+    description: "SMTP server hostname (leave empty to use AWS SES automatically)"
+    required: false
+  smtp-port:
+    description: "SMTP server port (default: 465)"
+    required: false
+    default: "465"
+  smtp-secure:
+    description: "Use secure connection (true/false)"
+    required: false
+    default: "true"
+  aws-region:
+    description: "AWS region for SES (optional if using SMTP)"
+    required: false
+  username:
+    description: "SMTP username or AWS access key"
+    required: false
+  password:
+    description: "SMTP password or AWS secret key"
+    required: false
+  from-email:
+    description: "Sender email address"
+    required: true
+  to-email:
+    description: "Recipient email addresses (comma-separated)"
+    required: true
+  cc-email:
+    description: "CC recipients (comma-separated)"
+    required: false
+  bcc-email:
+    description: "BCC recipients (comma-separated)"
+    required: false
+  subject:
+    description: "Email subject"
+    required: true
+  body:
+    description: "Plain text email body"
+    required: false
+  html-template:
+    description: "Path to HTML template (Handlebars supported)"
+    required: false
+  template-variables:
+    description: "JSON string with variables for template (e.g., '{\"name\": \"John\"}')"
+    required: false
+  attachments:
+    description: "Comma-separated file paths or glob patterns for attachments"
+    required: false
+
+runs:
+  using: "node20"
+  main: "index.js"

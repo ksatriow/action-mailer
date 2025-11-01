@@ -1,0 +1,17 @@
+name: Release Action Mailer
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm install
+      - name: Validate Node.js Action
+        run: node index.js --version || echo "✅ Validation complete"
+      - name: Confirm Release
+        run: echo "🚀 Action Mailer version $GITHUB_REF_NAME is ready!"

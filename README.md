@@ -1,8 +1,8 @@
 # 📧 Action Mailer
 
-![version](https://img.shields.io/github/v/tag/yourusername/action-mailer?label=version)
-![build](https://github.com/yourusername/action-mailer/actions/workflows/release.yml/badge.svg)
-![license](https://img.shields.io/github/license/yourusername/action-mailer)
+![version](https://img.shields.io/github/v/tag/ksatriow/action-mailer?label=version)
+![build](https://github.com/ksatriow/action-mailer/actions/workflows/release.yml/badge.svg)
+![license](https://img.shields.io/github/license/ksatriow/action-mailer)
 ![marketplace](https://img.shields.io/badge/GitHub%20Marketplace-Action%20Mailer-blue?logo=github)
 
 > Send beautiful and configurable emails directly from **GitHub Actions**, via **SMTP** or **AWS SES**, with support for **HTML templates**, **CC**, **BCC**, and **attachments**.

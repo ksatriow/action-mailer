@@ -5,7 +5,13 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "release:v1": "git tag v1 && git push origin v1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
   },
   "dependencies": {
     "@actions/core": "^1.10.1",
@@ -25,6 +31,14 @@
     "html",
     "automation"
   ],
-  "author": "yourname",
-  "license": "MIT"
+  "author": "ksatriow",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ksatriow/action-mailer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ksatriow/action-mailer/issues"
+  },
+  "homepage": "https://github.com/ksatriow/action-mailer#readme"
 }

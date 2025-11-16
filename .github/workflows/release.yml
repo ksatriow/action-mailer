@@ -1,4 +1,4 @@
-name: Release Action Mailer
+name: Release
 
 on:
   push:
@@ -6,12 +6,29 @@ on:
       - 'v*'
 
 jobs:
-  validate:
+  release:
     runs-on: ubuntu-latest
+    name: Create Release
     steps:
-      - uses: actions/checkout@v4
-      - run: npm install
-      - name: Validate Node.js Action
-        run: node index.js --version || echo "✅ Validation complete"
-      - name: Confirm Release
-        run: echo "🚀 Action Mailer version $GITHUB_REF_NAME is ready!"
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            ## What's Changed
+            
+            See [CHANGELOG.md](CHANGELOG.md) for details.
+            
+            ## Installation
+            
+            ```yaml
+            - uses: ksatriow/action-mailer@${{ github.ref_name }}
+            ```
+          draft: false
+          prerelease: false

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>❌ Build Failure Notification</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 40px 20px;
+  line-height: 1.6;
+}
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  overflow: hidden;
+}
+.header {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: #ffffff;
+  padding: 40px 30px;
+  text-align: center;
+}
+.header h1 {
+  font-size: 28px;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+.header p {
+  font-size: 16px;
+  opacity: 0.95;
+}
+.content {
+  padding: 40px 30px;
+  color: #333333;
+}
+.alert-box {
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+  padding: 20px;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+.alert-box h2 {
+  color: #856404;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin: 25px 0;
+}
+.info-item {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 3px solid #667eea;
+}
+.info-item strong {
+  display: block;
+  color: #667eea;
+  font-size: 12px;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  letter-spacing: 0.5px;
+}
+.info-item span {
+  color: #333;
+  font-size: 14px;
+  word-break: break-all;
+}
+.actions {
+  margin-top: 30px;
+  text-align: center;
+}
+.btn {
+  display: inline-block;
+  padding: 12px 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 25px;
+  font-weight: 600;
+  transition: transform 0.2s;
+}
+.btn:hover {
+  transform: translateY(-2px);
+}
+.footer {
+  background: #f8f9fa;
+  padding: 25px;
+  text-align: center;
+  color: #6c757d;
+  font-size: 13px;
+  border-top: 1px solid #e9ecef;
+}
+.footer strong {
+  color: #495057;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>❌ Build Failure</h1>
+    <p>Your workflow encountered an error</p>
+  </div>
+  <div class="content">
+    <div class="alert-box">
+      <h2>⚠️ Action Required</h2>
+      <p>The build for <strong>{{job_name}}</strong> failed on <strong>{{date}}</strong>.</p>
+    </div>
+    
+    <div class="info-grid">
+      <div class="info-item">
+        <strong>Repository</strong>
+        <span>{{repository}}</span>
+      </div>
+      <div class="info-item">
+        <strong>Branch</strong>
+        <span>{{branch}}</span>
+      </div>
+      <div class="info-item">
+        <strong>Commit</strong>
+        <span>{{commit}}</span>
+      </div>
+      <div class="info-item">
+        <strong>Triggered By</strong>
+        <span>{{actor}}</span>
+      </div>
+    </div>
+    
+    {{#if error_message}}
+    <div style="background: #f8d7da; border-left: 4px solid #dc3545; padding: 15px; border-radius: 8px; margin: 20px 0;">
+      <strong style="color: #721c24;">Error Details:</strong>
+      <pre style="margin-top: 10px; color: #721c24; font-size: 12px; white-space: pre-wrap;">{{error_message}}</pre>
+    </div>
+    {{/if}}
+    
+    <div class="actions">
+      <a href="{{workflow_url}}" class="btn">View Workflow Run</a>
+    </div>
+  </div>
+  <div class="footer">
+    Sent automatically by <strong>Action Mailer ✨</strong><br>
+    <small>{{date}}</small>
+  </div>
+</div>
+</body>
+</html>
+

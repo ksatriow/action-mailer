@@ -1,6 +1,6 @@
 name: "Action Mailer ✨"
 description: "Send beautiful emails via SMTP or AWS SES with HTML templates, CC/BCC, and attachments."
-author: "yourname"
+author: "ksatriow"
 branding:
   icon: "mail"
   color: "purple"
@@ -53,6 +53,28 @@ inputs:
   attachments:
     description: "Comma-separated file paths or glob patterns for attachments"
     required: false
+  reply-to:
+    description: "Reply-To email address"
+    required: false
+  custom-headers:
+    description: "JSON string with custom email headers (e.g., '{\"X-Custom-Header\": \"value\"}')"
+    required: false
+  dry-run:
+    description: "Test mode - validates configuration without sending email (true/false)"
+    required: false
+    default: "false"
+  debug:
+    description: "Enable debug mode with verbose logging (true/false)"
+    required: false
+    default: "false"
+  retry-count:
+    description: "Number of retry attempts if email sending fails (default: 0)"
+    required: false
+    default: "0"
+  retry-delay:
+    description: "Delay in milliseconds between retries (default: 1000)"
+    required: false
+    default: "1000"
 
 runs:
   using: "node20"

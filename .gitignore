@@ -28,7 +28,7 @@ Thumbs.db
 
 # Test artifacts
 coverage/
-dist/
+# dist/ (removed so we can commit bundled action)
 .env
 .env.local
 

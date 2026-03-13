@@ -76,6 +76,12 @@ inputs:
     required: false
     default: "1000"
 
+outputs:
+  message-id:
+    description: "The message ID returned by the email provider"
+  success:
+    description: "Set to 'true' on successful send"
+
 runs:
   using: "node20"
-  main: "index.js"
+  main: "dist/index.js"

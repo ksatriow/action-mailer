@@ -1,4 +1,4 @@
-name: Test Action
+name: Test Action Mailer
 
 on:
   workflow_dispatch:
@@ -7,9 +7,12 @@ on:
     branches: [main, master]
 
 jobs:
-  test:
+  # ─────────────────────────────────────────────
+  # Job 1: Unit Tests
+  # ─────────────────────────────────────────────
+  unit-test:
     runs-on: ubuntu-latest
-    name: Test Action Mailer
+    name: 🧪 Unit Tests
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,8 +25,358 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run basic validation
-        run: |
-          node -e "require('./index.js')" || echo "Action file loaded successfully"
-          echo "✅ Basic validation passed"
+      - name: Run Jest tests
+        run: npm test
 
+      - name: Validate action.yml loads correctly
+        run: |
+          node -e "
+            const yaml = require('fs').readFileSync('action.yml', 'utf8');
+            console.log('✅ action.yml is readable');
+
+            // Validate index.js can be required
+            try {
+              // We just verify syntax, not execution
+              require('child_process').execSync('node --check index.js');
+              console.log('✅ index.js syntax is valid');
+            } catch (e) {
+              console.error('❌ index.js has syntax errors');
+              process.exit(1);
+            }
+          "
+
+  # ─────────────────────────────────────────────
+  # Job 2: Dry-Run Test (SMTP - No actual email sent)
+  # ─────────────────────────────────────────────
+  dry-run-smtp:
+    runs-on: ubuntu-latest
+    name: 🧪 Dry-Run SMTP (Plain Text)
+    needs: unit-test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Test SMTP - Plain Text (Dry-Run)
+        uses: ./
+        with:
+          smtp-server: smtp.gmail.com
+          smtp-port: 465
+          smtp-secure: true
+          from-email: test@example.com
+          to-email: recipient@example.com
+          username: test-user
+          password: test-pass
+          subject: "🧪 Dry-Run Test - Plain Text - ${{ github.sha }}"
+          body: |
+            This is a dry-run test email.
+
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            Actor: ${{ github.actor }}
+            Workflow: ${{ github.workflow }}
+          dry-run: true
+          debug: true
+
+  # ─────────────────────────────────────────────
+  # Job 3: Dry-Run with HTML Template
+  # ─────────────────────────────────────────────
+  dry-run-template:
+    runs-on: ubuntu-latest
+    name: 🎨 Dry-Run SMTP (HTML Template)
+    needs: unit-test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Test SMTP - Success Template (Dry-Run)
+        uses: ./
+        with:
+          smtp-server: smtp.gmail.com
+          smtp-port: 465
+          smtp-secure: true
+          from-email: test@example.com
+          to-email: recipient@example.com
+          username: test-user
+          password: test-pass
+          subject: "✅ Dry-Run Test - Success Template"
+          html-template: "./templates/success.html"
+          template-variables: |
+            {
+              "name": "${{ github.actor }}",
+              "job_name": "${{ github.job }}",
+              "status": "SUCCESS"
+            }
+          dry-run: true
+          debug: true
+
+      - name: Test SMTP - Modern Success Template (Dry-Run)
+        uses: ./
+        with:
+          smtp-server: smtp.gmail.com
+          smtp-port: 465
+          from-email: test@example.com
+          to-email: recipient@example.com
+          username: test-user
+          password: test-pass
+          subject: "🎉 Dry-Run Test - Modern Success Template"
+          html-template: "./templates/modern-success.html"
+          template-variables: |
+            {
+              "name": "${{ github.actor }}",
+              "job_name": "dry-run-template",
+              "status": "SUCCESS",
+              "branch": "${{ github.ref_name }}",
+              "commit": "${{ github.sha }}",
+              "workflow": "${{ github.workflow }}",
+              "workflow_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }
+          dry-run: true
+          debug: true
+
+      - name: Test SMTP - Failure Template (Dry-Run)
+        uses: ./
+        with:
+          smtp-server: smtp.gmail.com
+          smtp-port: 465
+          from-email: test@example.com
+          to-email: devops@example.com
+          username: test-user
+          password: test-pass
+          subject: "❌ Dry-Run Test - Failure Template"
+          html-template: "./templates/failure.html"
+          template-variables: |
+            {
+              "name": "${{ github.actor }}",
+              "job_name": "dry-run-template",
+              "repository": "${{ github.repository }}",
+              "branch": "${{ github.ref_name }}",
+              "commit": "${{ github.sha }}",
+              "actor": "${{ github.actor }}",
+              "error_message": "This is a simulated error for template testing.",
+              "workflow_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }
+          dry-run: true
+          debug: true
+
+      - name: Test SMTP - Report Template (Dry-Run)
+        uses: ./
+        with:
+          smtp-server: smtp.gmail.com
+          smtp-port: 465
+          from-email: reports@example.com
+          to-email: team@example.com
+          username: test-user
+          password: test-pass
+          subject: "📊 Dry-Run Test - Report Template"
+          html-template: "./templates/report.html"
+          template-variables: |
+            {
+              "recipient": "Team",
+              "week": "${{ github.run_number }}",
+              "uptime": "99.9",
+              "deployments": "15",
+              "failed_jobs": "0",
+              "summary": "All systems operational. No incidents reported."
+            }
+          dry-run: true
+          debug: true
+
+  # ─────────────────────────────────────────────
+  # Job 4: Dry-Run with CC/BCC & Custom Headers
+  # ─────────────────────────────────────────────
+  dry-run-advanced:
+    runs-on: ubuntu-latest
+    name: ⚙️ Dry-Run SMTP (Advanced Features)
+    needs: unit-test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Test CC/BCC + Custom Headers (Dry-Run)
+        uses: ./
+        with:
+          smtp-server: smtp.gmail.com
+          smtp-port: 465
+          from-email: sender@example.com
+          to-email: recipient1@example.com,recipient2@example.com
+          cc-email: cc1@example.com,cc2@example.com
+          bcc-email: bcc@example.com
+          reply-to: support@example.com
+          username: test-user
+          password: test-pass
+          subject: "🏷️ Dry-Run Test - CC/BCC + Custom Headers"
+          body: "Testing multiple recipients with CC, BCC, Reply-To, and custom headers."
+          custom-headers: |
+            {
+              "X-Priority": "1",
+              "X-MSMail-Priority": "High",
+              "X-Custom-ID": "${{ github.run_id }}",
+              "X-Workflow": "${{ github.workflow }}"
+            }
+          dry-run: true
+          debug: true
+
+      - name: Test with Retry Config (Dry-Run)
+        uses: ./
+        with:
+          smtp-server: smtp.gmail.com
+          smtp-port: 587
+          smtp-secure: false
+          from-email: sender@example.com
+          to-email: recipient@example.com
+          username: test-user
+          password: test-pass
+          subject: "🔄 Dry-Run Test - Retry Configuration"
+          body: "Testing retry mechanism configuration."
+          retry-count: 3
+          retry-delay: 2000
+          dry-run: true
+          debug: true
+
+      - name: Test with Attachment Patterns (Dry-Run)
+        run: |
+          mkdir -p test-attachments
+          echo "Test log content" > test-attachments/build.log
+          echo "Test report" > test-attachments/report.txt
+
+      - name: Run Attachment Test (Dry-Run)
+        uses: ./
+        with:
+          smtp-server: smtp.gmail.com
+          smtp-port: 465
+          from-email: sender@example.com
+          to-email: recipient@example.com
+          username: test-user
+          password: test-pass
+          subject: "📎 Dry-Run Test - With Attachments"
+          body: "Testing attachment glob patterns."
+          attachments: "test-attachments/*.log,test-attachments/*.txt"
+          dry-run: true
+          debug: true
+
+  # ─────────────────────────────────────────────
+  # Job 5: Dry-Run AWS SES
+  # ─────────────────────────────────────────────
+  dry-run-ses:
+    runs-on: ubuntu-latest
+    name: ☁️ Dry-Run AWS SES
+    needs: unit-test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Test AWS SES (Dry-Run)
+        uses: ./
+        with:
+          aws-region: us-east-1
+          from-email: ses-sender@example.com
+          to-email: ses-recipient@example.com
+          cc-email: ses-cc@example.com
+          username: test-aws-access-key
+          password: test-aws-secret-key
+          subject: "☁️ Dry-Run Test - AWS SES"
+          html-template: "./templates/success.html"
+          template-variables: |
+            {
+              "name": "${{ github.actor }}",
+              "job_name": "ses-dry-run",
+              "status": "SUCCESS"
+            }
+          dry-run: true
+          debug: true
+
+  # ─────────────────────────────────────────────
+  # Job 6: Real SMTP Test (Only if secrets exist)
+  # ─────────────────────────────────────────────
+  real-smtp-test:
+    runs-on: ubuntu-latest
+    name: 📧 Real SMTP Test (Optional)
+    needs: [dry-run-smtp, dry-run-template, dry-run-advanced, dry-run-ses]
+    if: |
+      github.event_name == 'workflow_dispatch' &&
+      github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check if SMTP secrets are available
+        id: check-secrets
+        run: |
+          if [ -n "${{ secrets.SMTP_USERNAME }}" ] && [ -n "${{ secrets.SMTP_PASSWORD }}" ]; then
+            echo "has_smtp=true" >> $GITHUB_OUTPUT
+            echo "✅ SMTP secrets are configured"
+          else
+            echo "has_smtp=false" >> $GITHUB_OUTPUT
+            echo "⚠️ SMTP secrets not configured - skipping real email test"
+          fi
+
+      - name: Send Real Email via SMTP
+        if: steps.check-secrets.outputs.has_smtp == 'true'
+        id: send-email
+        uses: ./
+        with:
+          smtp-server: ${{ secrets.SMTP_SERVER || 'smtp.gmail.com' }}
+          smtp-port: ${{ secrets.SMTP_PORT || '465' }}
+          smtp-secure: true
+          from-email: ${{ secrets.FROM_EMAIL }}
+          to-email: ${{ secrets.TO_EMAIL }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "✅ Action Mailer Test - ${{ github.repository }} (Run #${{ github.run_number }})"
+          html-template: "./templates/modern-success.html"
+          template-variables: |
+            {
+              "name": "${{ github.actor }}",
+              "job_name": "real-smtp-test",
+              "status": "SUCCESS",
+              "branch": "${{ github.ref_name }}",
+              "commit": "${{ github.sha }}",
+              "workflow": "${{ github.workflow }}",
+              "workflow_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }
+          debug: true
+
+      - name: Verify Email Output
+        if: steps.check-secrets.outputs.has_smtp == 'true'
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📧 Email sent successfully!"
+          echo "   Message ID: ${{ steps.send-email.outputs.message-id }}"
+          echo "   Success: ${{ steps.send-email.outputs.success }}"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+  # ─────────────────────────────────────────────
+  # Job 7: Summary
+  # ─────────────────────────────────────────────
+  test-summary:
+    runs-on: ubuntu-latest
+    name: 📋 Test Summary
+    needs: [unit-test, dry-run-smtp, dry-run-template, dry-run-advanced, dry-run-ses]
+    if: always()
+    steps:
+      - name: Test Results Summary
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📋 Action Mailer - Test Results Summary"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "🧪 Unit Tests:            ${{ needs.unit-test.result }}"
+          echo "📧 Dry-Run SMTP:          ${{ needs.dry-run-smtp.result }}"
+          echo "🎨 Dry-Run Templates:     ${{ needs.dry-run-template.result }}"
+          echo "⚙️  Dry-Run Advanced:      ${{ needs.dry-run-advanced.result }}"
+          echo "☁️  Dry-Run SES:           ${{ needs.dry-run-ses.result }}"
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+          # Fail if any required job failed
+          if [ "${{ needs.unit-test.result }}" != "success" ] || \
+             [ "${{ needs.dry-run-smtp.result }}" != "success" ] || \
+             [ "${{ needs.dry-run-template.result }}" != "success" ] || \
+             [ "${{ needs.dry-run-advanced.result }}" != "success" ] || \
+             [ "${{ needs.dry-run-ses.result }}" != "success" ]; then
+            echo "❌ Some tests failed!"
+            exit 1
+          fi
+
+          echo "✅ All tests passed! 🎉"

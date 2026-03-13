@@ -347,12 +347,47 @@ jobs:
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
   # ─────────────────────────────────────────────
+  # ─────────────────────────────────────────────
+  # Job 6: Real Simple Notification Test (Your Snippet)
+  # ─────────────────────────────────────────────
+  real-simple-notify-test:
+    runs-on: ubuntu-latest
+    name: ✉️ Real Simple Notification
+    needs: unit-test
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Send Simple Notification
+        id: send-simple
+        uses: ./
+        with:
+          smtp-server: smtp.gmail.com
+          smtp-port: 587
+          smtp-secure: false
+          from-email: ${{ secrets.FROM_EMAIL || 'ksatrio@gmail.com' }}
+          to-email: ${{ secrets.TO_EMAIL || 'admin@example.com' }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "🚀 Build Completed: ${{ github.repository }}"
+          body: |
+            Halo! Ini adalah test dari workflow.
+            
+            Your build has completed successfully!
+            
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            Actor: ${{ github.actor }}
+          debug: true
+
+  # ─────────────────────────────────────────────
   # Job 7: Summary
   # ─────────────────────────────────────────────
   test-summary:
     runs-on: ubuntu-latest
     name: 📋 Test Summary
-    needs: [unit-test, dry-run-smtp, dry-run-template, dry-run-advanced, dry-run-ses]
+    needs: [unit-test, dry-run-smtp, dry-run-template, dry-run-advanced, dry-run-ses, real-simple-notify-test]
     if: always()
     steps:
       - name: Test Results Summary
